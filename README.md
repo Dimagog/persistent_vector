@@ -1,6 +1,6 @@
 # Persistent Vector for Elixir
 [![hex.pm version](https://img.shields.io/hexpm/v/persistent_vector.svg)](https://hex.pm/packages/persistent_vector)
-![](https://img.shields.io/hexpm/l/persistent_vector.svg)
+[![license](https://img.shields.io/hexpm/l/persistent_vector.svg)](LICENSE.md)
 
 ## Installation
 
