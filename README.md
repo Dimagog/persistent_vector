@@ -9,7 +9,7 @@ Add `persistent_vector` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
 [
-  {:persistent_vector, "~> 0.1.0"}
+  {:persistent_vector, "~> 0.1.1"}
 ]
 end
 ```

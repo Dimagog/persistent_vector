@@ -502,14 +502,6 @@ defmodule PersistentVector do
       reduce(v, 0, acc, fun)
     end
 
-    defp reduce(_v, _i, {:halt, acc}, _fun) do
-      {:halted, acc}
-    end
-
-    defp reduce(v, i, {:suspend, acc}, fun) do
-      {:suspended, acc, &reduce(v, i, &1, fun)}
-    end
-
     defp reduce(v = %@for{count: count}, i, {:cont, acc}, fun)
       when i < count
     do
@@ -518,6 +510,14 @@ defmodule PersistentVector do
 
     defp reduce(_v, _i, {:cont, acc}, _fun) do
       {:done, acc}
+    end
+
+    defp reduce(_v, _i, {:halt, acc}, _fun) do
+      {:halted, acc}
+    end
+
+    defp reduce(v, i, {:suspend, acc}, fun) do
+      {:suspended, acc, &reduce(v, i, &1, fun)}
     end
   end
 

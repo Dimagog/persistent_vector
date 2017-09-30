@@ -17,13 +17,19 @@ If building speed is not important, but removal from the end happens often, then
 * `PersistentVector.get/2` is slightly faster for *larger* collections compared to `:array`.
 * `PersistentVector.set/3` is slightly faster for *smaller* collections compared to `:array`.
 
+`Map` is added only for a baseline. In a sense that if `Map` was to outperform `PersistentVector` then this library would not be needed.
+This comparison is *not fair* to `Map` as it has much richer capabilities.
+The fact that `Map` performs worse for bigger collections is not surprising and is not `Map`'s fault :-).
+
 ## Future Perf Improvements
 
 This is a first version and no perf-tuning has been done so far.
 
 The speed of building from `enumerable` can be further improved by reading input in 32-element chunks and appending them directly to `root` bypassing `tail`.
 
-## Raw Benchmarking results for v0.1.0
+Enumeration speed can also be improved by doing it in 32-element leaf node chunks.
+
+## Raw Benchmarking results for v0.1.1
 
 ```none
 Using 2 inputs
@@ -34,25 +40,29 @@ Using 2 inputs
 
 ##### With input     1'000 #####
 Name                   ips        average  deviation         median
-List   Build       41.33 K       24.19 μs    ±32.16%       31.00 μs
-Vector Build        9.18 K      108.99 μs    ±65.96%      150.00 μs
-Array  Build        4.41 K      226.61 μs    ±34.41%      160.00 μs
+List   Build       41.43 K       24.13 μs    ±32.24%       31.00 μs
+Vector Build        9.25 K      108.15 μs    ±66.78%      150.00 μs
+Map    Build        4.60 K      217.59 μs    ±35.13%      160.00 μs
+Array  Build        4.42 K      226.07 μs    ±34.40%      160.00 μs
 
 Comparison:
-List   Build       41.33 K
-Vector Build        9.18 K - 4.50x slower
-Array  Build        4.41 K - 9.37x slower
+List   Build       41.43 K
+Vector Build        9.25 K - 4.48x slower
+Map    Build        4.60 K - 9.02x slower
+Array  Build        4.42 K - 9.37x slower
 
 ##### With input 1'000'000 #####
 Name                   ips        average  deviation         median
-List   Build         13.76       72.70 ms    ±10.24%       78.00 ms
-Vector Build          5.76      173.48 ms     ±5.75%      172.00 ms
-Array  Build          1.65      607.53 ms     ±1.94%      609.00 ms
+List   Build         14.06       71.15 ms    ±10.85%       78.00 ms
+Vector Build          5.77      173.22 ms     ±5.30%      172.00 ms
+Array  Build          1.66      602.94 ms     ±1.61%      609.00 ms
+Map    Build          0.99     1007.80 ms     ±1.97%     1007.50 ms
 
 Comparison:
-List   Build         13.76
-Vector Build          5.76 - 2.39x slower
-Array  Build          1.65 - 8.36x slower
+List   Build         14.06
+Vector Build          5.77 - 2.43x slower
+Array  Build          1.66 - 8.47x slower
+Map    Build          0.99 - 14.16x slower
 
 #
 # Shrink
@@ -60,21 +70,25 @@ Array  Build          1.65 - 8.36x slower
 
 ##### With input     1'000 #####
 Name                         ips        average  deviation         median
-Array  resize            14.73 K       67.89 μs    ±10.95%       63.00 μs
-Vector remove_last        7.55 K      132.49 μs    ±42.49%      160.00 μs
+Array  resize            13.96 K       71.65 μs    ±11.36%       78.00 μs
+Vector remove_last        6.91 K      144.74 μs    ±36.61%      160.00 μs
+Map    resize             4.05 K      246.67 μs    ±31.47%      310.00 μs
 
 Comparison:
-Array  resize            14.73 K
-Vector remove_last        7.55 K - 1.95x slower
+Array  resize            13.96 K
+Vector remove_last        6.91 K - 2.02x slower
+Map    resize             4.05 K - 3.44x slower
 
 ##### With input 1'000'000 #####
 Name                         ips        average  deviation         median
-Array  resize              13.36       74.86 ms     ±8.55%       78.00 ms
-Vector remove_last          6.25      159.97 ms     ±4.19%      156.00 ms
+Array  resize              13.10       76.34 ms     ±7.94%       78.00 ms
+Vector remove_last          6.14      162.81 ms     ±5.01%      157.00 ms
+Map    resize               1.05      950.27 ms     ±3.57%      937.00 ms
 
 Comparison:
-Array  resize              13.36
-Vector remove_last          6.25 - 2.14x slower
+Array  resize              13.10
+Vector remove_last          6.14 - 2.13x slower
+Map    resize               1.05 - 12.45x slower
 
 #
 # Get
@@ -82,21 +96,25 @@ Vector remove_last          6.25 - 2.14x slower
 
 ##### With input     1'000 #####
 Name                 ips        average  deviation         median
-Vector Get        7.68 K      130.20 μs    ±44.88%      160.00 μs
-Array  Get        7.36 K      135.89 μs    ±38.84%      160.00 μs
+Map    Get       15.58 K       64.20 μs   ±119.83%         0.0 μs
+Vector Get        7.68 K      130.25 μs    ±44.82%      160.00 μs
+Array  Get        7.37 K      135.70 μs    ±39.04%      160.00 μs
 
 Comparison:
-Vector Get        7.68 K
-Array  Get        7.36 K - 1.04x slower
+Map    Get       15.58 K
+Vector Get        7.68 K - 2.03x slower
+Array  Get        7.37 K - 2.11x slower
 
 ##### With input 1'000'000 #####
 Name                 ips        average  deviation         median
-Vector Get          5.86      170.54 ms     ±2.53%      172.00 ms
-Array  Get          4.13      242.19 ms     ±3.23%      242.50 ms
+Vector Get          5.85      171.08 ms     ±2.05%      172.00 ms
+Array  Get          4.14      241.81 ms     ±3.23%      235.00 ms
+Map    Get          3.14      318.84 ms     ±6.58%      312.00 ms
 
 Comparison:
-Vector Get          5.86
-Array  Get          4.13 - 1.42x slower
+Vector Get          5.85
+Array  Get          4.14 - 1.41x slower
+Map    Get          3.14 - 1.86x slower
 
 #
 # Set
@@ -104,19 +122,45 @@ Array  Get          4.13 - 1.42x slower
 
 ##### With input     1'000 #####
 Name                 ips        average  deviation         median
-Vector Set        4.40 K      227.12 μs    ±34.31%      160.00 μs
-Array  Set        3.38 K      295.90 μs    ±16.25%      310.00 μs
+Map    Set        4.58 K      218.36 μs    ±35.04%      160.00 μs
+Vector Set        4.36 K      229.54 μs    ±33.97%      160.00 μs
+Array  Set        3.35 K      298.54 μs    ±15.06%      310.00 μs
 
 Comparison:
-Vector Set        4.40 K
-Array  Set        3.38 K - 1.30x slower
+Map    Set        4.58 K
+Vector Set        4.36 K - 1.05x slower
+Array  Set        3.35 K - 1.37x slower
 
 ##### With input 1'000'000 #####
 Name                 ips        average  deviation         median
-Array  Set          1.44      694.80 ms     ±2.17%      688.00 ms
-Vector Set          1.24      807.69 ms     ±2.32%      813.00 ms
+Array  Set          1.41      708.33 ms     ±3.22%      703.00 ms
+Vector Set          1.18      849.00 ms     ±2.85%      844.00 ms
+Map    Set          0.80     1253.88 ms     ±3.92%     1234.00 ms
 
 Comparison:
-Array  Set          1.44
-Vector Set          1.24 - 1.16x slower
+Array  Set          1.41
+Vector Set          1.18 - 1.20x slower
+Map    Set          0.80 - 1.77x slower
+
+#
+# Enumerate
+#
+
+##### With input     1'000 #####
+Name                       ips        average  deviation         median
+Map    Enumerate       14.11 K       70.86 μs    ±11.05%       78.00 μs
+Vector Enumerate        6.69 K      149.48 μs    ±22.24%      160.00 μs
+
+Comparison:
+Map    Enumerate       14.11 K
+Vector Enumerate        6.69 K - 2.11x slower
+
+##### With input 1'000'000 #####
+Name                       ips        average  deviation         median
+Map    Enumerate          8.10      123.46 ms    ±16.02%      125.00 ms
+Vector Enumerate          5.15      194.12 ms     ±4.84%      188.00 ms
+
+Comparison:
+Map    Enumerate          8.10
+Vector Enumerate          5.15 - 1.57x slower
 ```
