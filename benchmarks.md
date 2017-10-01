@@ -25,7 +25,7 @@ The fact that `Map` performs worse for bigger collections is not surprising and 
 
 The speed of building from `enumerable` can be further improved by reading input in 32-element chunks and appending them directly to `root` bypassing `tail`.
 
-## Raw Benchmarking results for v0.1.1
+## Raw Benchmarking results for v0.1.2
 
 ```none
 Using 2 inputs

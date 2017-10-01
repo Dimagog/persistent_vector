@@ -9,7 +9,7 @@ defmodule PersistentVector.Mixfile do
       app: :persistent_vector,
       name: "Persistent Vector",
       version: @version,
-      description: "PersistentVector is an array-like collection of values indexed by contiguous `0`-based integer index.",
+      description: "PersistentVector is an array-like collection of values indexed by contiguous 0-based integer index.",
       elixir: "~> 1.4",
       start_permanent: Mix.env == :prod,
       deps: deps(),
