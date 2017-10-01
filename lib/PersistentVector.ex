@@ -466,6 +466,89 @@ defmodule PersistentVector do
     []
   end
 
+  @doc false # "See `Enumerable.reduce/3`"
+  @spec reduce(t, Enumerable.acc, Enumerable.reducer) :: Enumerable.result
+  def reduce(v = %@state{}, acc, fun) do
+    reduce_root(v.root, v.tail, v.shift, 0, acc, fun)
+  end
+
+  @spec reduce_root(tuple, tuple, shift, index, Enumerable.acc | Enumerable.result, Enumerable.reducer) :: Enumerable.result
+  defp reduce_root(arr, tail, level, i, acc = {:cont, _}, fun)
+    when i < tuple_size(arr)
+  do
+    reduce_root(arr, tail, level, i+1, reduce_node(elem(arr, i), level - @shift, 0, acc, fun), fun)
+  end
+
+  defp reduce_root(_arr, tail, _level, _i, acc = {:cont, _}, fun)
+  # when i == tuple_size(arr)
+  do
+    reduce_tail(tail, 0, acc, fun)
+  end
+
+  defp reduce_root(_arr, _tail, _level, _i, acc = {:halted, _}, _fun) do
+    acc
+  end
+
+  defp reduce_root(arr, tail, level, i, {:suspended, acc, cont_fn}, fun) do
+    {:suspended, acc, &reduce_root(arr, tail, level, i, cont_fn.(&1), fun)}
+  end
+
+  @spec reduce_tail(tuple, index, Enumerable.acc, Enumerable.reducer) :: Enumerable.result
+  defp reduce_tail(arr, i, {:cont, acc}, fun)
+    when i < tuple_size(arr)
+  do
+    reduce_tail(arr, i+1, fun.(elem(arr, i), acc), fun)
+  end
+
+  defp reduce_tail(_arr, _i, {:cont, acc}, _fun)
+  # when i == tuple_size(arr)
+  do
+    {:done, acc}
+  end
+
+  defp reduce_tail(_arr, _i, {:halt, acc}, _fun) do
+    {:halted, acc}
+  end
+
+  defp reduce_tail(arr, i, {:suspend, acc}, fun) do
+    {:suspended, acc, &reduce_tail(arr, i, &1, fun)}
+  end
+
+  @spec reduce_node(tuple, shift, index, Enumerable.acc | Enumerable.result, Enumerable.reducer) :: Enumerable.result
+  defp reduce_node(arr, level, i, acc = {:cont, _}, fun)
+    when level > 0 and i < tuple_size(arr)
+  do
+    reduce_node(arr, level, i+1, reduce_node(elem(arr, i), level - @shift, 0, acc, fun), fun)
+  end
+
+  defp reduce_node(arr, level, i, {:cont, acc}, fun)
+    when i < tuple_size(arr) # and level == 0
+  do
+    reduce_node(arr, level, i+1, fun.(elem(arr, i), acc), fun)
+  end
+
+  defp reduce_node(_arr, _level, _i, acc = {:cont, _}, _fun)
+  # when i == tuple_size(arr)
+  do
+    acc
+  end
+
+  defp reduce_node(_arr, 0, _i, {:halt, acc}, _fun) do
+    {:halted, acc}
+  end
+
+  defp reduce_node(_arr, _level, _i, acc = {:halted, _}, _fun) do
+    acc
+  end
+
+  defp reduce_node(arr, 0, i, {:suspend, acc}, fun) do
+    {:suspended, acc, &reduce_node(arr, 0, i, &1, fun)}
+  end
+
+  defp reduce_node(arr, level, i, {:suspended, acc, cont_fn}, fun) do
+    {:suspended, acc, &reduce_node(arr, level, i, cont_fn.(&1), fun)}
+  end
+
   @behaviour Access
 
   # `get/3` is implemented above
@@ -494,31 +577,11 @@ defmodule PersistentVector do
   end
 
   defimpl Enumerable do
-    def count(v = %@for{}), do: {:ok, @for.count(v)}
+    def count(v), do: {:ok, @for.count(v)}
 
     def member?(%@for{}, _element), do: {:error, __MODULE__}
 
-    def reduce(v = %@for{count: count}, acc, fun) do
-      reduce(v, 0, count, acc, fun)
-    end
-
-    defp reduce(v, i, count, {:cont, acc}, fun)
-      when i < count
-    do
-      reduce(v, i + 1, count, fun.(v |> @for.fast_get(i), acc), fun)
-    end
-
-    defp reduce(_v, _i, _count, {:cont, acc}, _fun) do
-      {:done, acc}
-    end
-
-    defp reduce(_v, _i, _count, {:halt, acc}, _fun) do
-      {:halted, acc}
-    end
-
-    defp reduce(v, i, count, {:suspend, acc}, fun) do
-      {:suspended, acc, &reduce(v, i, count, &1, fun)}
-    end
+    def reduce(v, acc, fun), do: @for.reduce(v, acc, fun)
   end
 
   defimpl Collectable do

@@ -23,11 +23,7 @@ The fact that `Map` performs worse for bigger collections is not surprising and 
 
 ## Future Perf Improvements
 
-This is a first version and no perf-tuning has been done so far.
-
 The speed of building from `enumerable` can be further improved by reading input in 32-element chunks and appending them directly to `root` bypassing `tail`.
-
-Enumeration speed can also be improved by doing it in 32-element leaf node chunks.
 
 ## Raw Benchmarking results for v0.1.1
 
@@ -148,19 +144,19 @@ Map    Set          0.80 - 1.77x slower
 
 ##### With input     1'000 #####
 Name                       ips        average  deviation         median
-Map    Enumerate       12.04 K       83.03 μs     ±8.69%       78.00 μs
-Vector Enumerate        7.04 K      142.06 μs    ±31.76%      160.00 μs
+Vector Enumerate       17.19 K       58.17 μs    ±12.08%       62.00 μs
+Map    Enumerate       14.01 K       71.36 μs    ±10.89%       78.00 μs
 
-Comparison: 
-Map    Enumerate       12.04 K
-Vector Enumerate        7.04 K - 1.71x slower
+Comparison:
+Vector Enumerate       17.19 K
+Map    Enumerate       14.01 K - 1.23x slower
 
 ##### With input 1'000'000 #####
 Name                       ips        average  deviation         median
-Map    Enumerate          8.10      123.46 ms    ±16.00%      125.00 ms
-Vector Enumerate          5.35      186.93 ms     ±4.24%      187.00 ms
+Vector Enumerate         15.60       64.10 ms     ±7.92%       63.00 ms
+Map    Enumerate          8.07      123.84 ms    ±15.47%      125.00 ms
 
-Comparison: 
-Map    Enumerate          8.10
-Vector Enumerate          5.35 - 1.51x slower
+Comparison:
+Vector Enumerate         15.60
+Map    Enumerate          8.07 - 1.93x slower
 ```

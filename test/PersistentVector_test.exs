@@ -136,6 +136,20 @@ defmodule PersistentVectorTest do
     end
   end
 
+  property "Enumerable.halt" do
+    let [m <- nat(), n <- choose(m, 17_000)] do
+      v =
+        if n > 0 do
+          Enum.reduce(0..n-1, empty(), &(&2 |> append(&1))) |> assert_element_identity()
+        else
+          empty()
+        end
+      lt = v |> Enum.take(m)
+      lt |> new() |> assert_element_identity()
+      assert lt |> Enum.count() == m
+    end
+  end
+
   property "Collectable" do
     forall n <- nat() do
       if n > 0 do
