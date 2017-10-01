@@ -148,19 +148,19 @@ Map    Set          0.80 - 1.77x slower
 
 ##### With input     1'000 #####
 Name                       ips        average  deviation         median
-Map    Enumerate       14.11 K       70.86 μs    ±11.05%       78.00 μs
-Vector Enumerate        6.69 K      149.48 μs    ±22.24%      160.00 μs
+Map    Enumerate       12.04 K       83.03 μs     ±8.69%       78.00 μs
+Vector Enumerate        7.04 K      142.06 μs    ±31.76%      160.00 μs
 
-Comparison:
-Map    Enumerate       14.11 K
-Vector Enumerate        6.69 K - 2.11x slower
+Comparison: 
+Map    Enumerate       12.04 K
+Vector Enumerate        7.04 K - 1.71x slower
 
 ##### With input 1'000'000 #####
 Name                       ips        average  deviation         median
-Map    Enumerate          8.10      123.46 ms    ±16.02%      125.00 ms
-Vector Enumerate          5.15      194.12 ms     ±4.84%      188.00 ms
+Map    Enumerate          8.10      123.46 ms    ±16.00%      125.00 ms
+Vector Enumerate          5.35      186.93 ms     ±4.24%      187.00 ms
 
-Comparison:
+Comparison: 
 Map    Enumerate          8.10
-Vector Enumerate          5.15 - 1.57x slower
+Vector Enumerate          5.35 - 1.51x slower
 ```
