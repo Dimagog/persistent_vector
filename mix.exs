@@ -1,7 +1,7 @@
 defmodule PersistentVector.Mixfile do
   use Mix.Project
 
-  @version "0.1.2"
+  @version "0.1.3"
   @github "https://github.com/dimagog/persistent_vector"
 
   def project do
@@ -12,6 +12,7 @@ defmodule PersistentVector.Mixfile do
       description: "PersistentVector is an array-like collection of values indexed by contiguous 0-based integer index.",
       elixir: "~> 1.4",
       start_permanent: Mix.env == :prod,
+      elixirc_paths: elixirc_paths(Mix.env),
       deps: deps(),
 
       dialyzer: [
@@ -42,6 +43,9 @@ defmodule PersistentVector.Mixfile do
       ]
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test"]
+  defp elixirc_paths(_),     do: ["lib"]
 
   def application do
     [applications: []]

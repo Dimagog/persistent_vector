@@ -489,6 +489,10 @@ defmodule PersistentVector do
     acc
   end
 
+  defp reduce_root(_arr, _tail, _level, _i, {:halt, acc}, _fun) do
+    {:halted, acc}
+  end
+
   defp reduce_root(arr, tail, level, i, {:suspended, acc, cont_fn}, fun) do
     {:suspended, acc, &reduce_root(arr, tail, level, i, cont_fn.(&1), fun)}
   end
