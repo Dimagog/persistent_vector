@@ -3,7 +3,7 @@
 setlocal ENABLEDELAYEDEXPANSION
 if "%diff%" == "" set diff=fc
 
-call mix run bench\bench.exs >b
+call mix run bench\bench.exs %* >b
 
 if exist a (
   call %diff% a b
@@ -15,4 +15,5 @@ if exist a (
 ) else (
   echo Established base 'a'
   move /Y b a >nul
+  call %diff% benchmarks.md a
 )
