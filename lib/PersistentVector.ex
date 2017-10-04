@@ -93,7 +93,7 @@ defmodule PersistentVector do
 
   @doc "Returns `PersistentVector` with elements from `enumerable`."
   @spec new(Enumerable.t) :: t
-  def new(enumerable), do: enumerable |> Enum.reduce(empty(), &(&2 |> append(&1)))
+  def new(enumerable), do: append_all(empty(), enumerable)
 
   @doc "Returns `true` if `v` is empty and `false` otherwise."
   @spec empty?(t) :: boolean
@@ -329,6 +329,40 @@ defmodule PersistentVector do
   def append(v = %@state{}, new_value) do
     new_count = v.count + 1
     new_tail = {new_value}
+    case v.root |> append_block(v.shift, v.tail) do
+      {:ok, new_root} ->
+        %{v | count: new_count, root: new_root, tail: new_tail}
+      {:overflow, tail_path} ->
+        new_root = {v.root, tail_path}
+        %{v | count: new_count, root: new_root, tail: new_tail, shift: v.shift + @shift}
+    end
+  end
+
+  def append_all(v = %@state{count: count, tail: tail}, enumerable) do
+    # enumerable |> Enum.reduce(v, &(&2 |> append(&1)))
+
+    required_tail_fill_size = @block - tuple_size(tail)
+    {v, enumerable} = if required_tail_fill_size > 0 do
+      tail_fill = Enum.take(enumerable, required_tail_fill_size)
+      real_fill_size = tail_fill |> Enum.count
+      if real_fill_size > 0 do
+        new_tail = tail |> Tuple.to_list |> Kernel.++(tail_fill) |> List.to_tuple
+        new_count = count + real_fill_size
+        new_enumerable = enumerable |> Stream.drop(real_fill_size)
+        {%{v | tail: new_tail, count: new_count}, new_enumerable}
+      else
+        {v, enumerable}
+      end
+    else
+      {v, enumerable}
+    end
+
+    enumerable |> Stream.chunk_every(@block) |> Enum.reduce(v, &(&2 |> append_block(&1 |> List.to_tuple)))
+  end
+
+  defp append_block(v, tail) do
+    new_count = v.count + tuple_size(tail)
+    new_tail = tail
     case v.root |> append_block(v.shift, v.tail) do
       {:ok, new_root} ->
         %{v | count: new_count, root: new_root, tail: new_tail}

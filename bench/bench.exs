@@ -70,10 +70,11 @@ IO.puts :stderr, "Using #{Enum.count(inputs)} inputs"
 
 Runner.bench("Build",
   %{
-  "Vector Build" => fn range -> Enum.reduce(range, Vec.empty(), &(&2 |> Vec.append(&1))) end,
-  "Array  Build" => fn range -> Enum.reduce(range, :array.new(), &:array.set(&1, &1, &2)) end,
-  "List   Build" => fn range -> Enum.reduce(range, [], &[&1 | &2]) |> :lists.reverse() end,
-  "Map    Build" => fn range -> Enum.reduce(range, %{}, &Map.put(&2, &1, &1)) end,
+  "Vector append" => fn range -> Enum.reduce(range, Vec.empty(), &(&2 |> Vec.append(&1))) end,
+  "Vector new"    => fn range -> Vec.new(range) end,
+  "Array  Build"  => fn range -> Enum.reduce(range, :array.new(), &:array.set(&1, &1, &2)) end,
+  "List   Build"  => fn range -> Enum.reduce(range, [], &[&1 | &2]) |> :lists.reverse() end,
+  "Map    Build"  => fn range -> Enum.reduce(range, %{}, &Map.put(&2, &1, &1)) end,
   },
   inputs)
 

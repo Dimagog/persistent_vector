@@ -1,0 +1,34 @@
+
+#
+# Build
+#
+
+##### With input     1'000 #####
+Name                    ips        average  deviation         median
+List   Build        39.42 K       25.37 μs   ±227.30%         0.0 μs
+Vector append        9.24 K      108.18 μs   ±366.87%         0.0 μs
+Vector new           6.90 K      145.00 μs   ±312.85%         0.0 μs
+Map    Build         4.58 K      218.48 μs    ±35.04%      160.00 μs
+Array  Build         4.38 K      228.48 μs    ±34.06%      160.00 μs
+
+Comparison: 
+List   Build        39.42 K
+Vector append        9.24 K - 4.26x slower
+Vector new           6.90 K - 5.72x slower
+Map    Build         4.58 K - 8.61x slower
+Array  Build         4.38 K - 9.01x slower
+
+##### With input 1'000'000 #####
+Name                    ips        average  deviation         median
+List   Build          14.04       71.23 ms    ±10.96%       78.00 ms
+Vector append          5.73      174.44 ms     ±5.34%      172.00 ms
+Vector new             3.77      265.58 ms     ±6.36%      257.50 ms
+Array  Build           1.65      606.20 ms     ±1.95%      609.00 ms
+Map    Build           0.99     1005.33 ms     ±3.19%     1000.00 ms
+
+Comparison: 
+List   Build          14.04
+Vector append          5.73 - 2.45x slower
+Vector new             3.77 - 3.73x slower
+Array  Build           1.65 - 8.51x slower
+Map    Build           0.99 - 14.11x slower
