@@ -124,3 +124,13 @@ Runner.bench("Enumerate",
   "Map    Enumerate" => fn %{map: map} -> Enum.each(map, &(&1)) end,
   },
   data_inputs)
+
+Runner.bench("to_list",
+  %{
+  "Vector into"    => fn %{vec: vec} -> vec |> Enum.into([]) end,
+  "Vector to_list" => fn %{vec: vec} -> vec |> Vec.to_list() end,
+  "Array  to_list" => fn %{arr: arr} -> arr |> :array.to_list() end,
+  "Map    into"    => fn %{map: map} -> map |> Enum.into([]) end,
+  "Map    to_list" => fn %{map: map} -> map |> Map.to_list() end,
+  },
+  data_inputs)

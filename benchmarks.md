@@ -21,11 +21,7 @@ If building speed is not important, but removal from the end happens often, then
 This comparison is *not fair* to `Map` as it has much richer capabilities.
 The fact that `Map` performs worse for bigger collections is not surprising and is not `Map`'s fault :-).
 
-## Future Perf Improvements
-
-The speed of building from `enumerable` can be further improved by reading input in 32-element chunks and appending them directly to `root` bypassing `tail`.
-
-## Raw Benchmarking results for v0.1.2
+## Raw Benchmarking results for v0.1.3
 
 ```none
 Using 2 inputs
@@ -159,4 +155,38 @@ Map    Enumerate          8.07      123.84 ms    ±15.47%      125.00 ms
 Comparison:
 Vector Enumerate         15.60
 Map    Enumerate          8.07 - 1.93x slower
+
+#
+# to_list
+#
+
+##### With input     1'000 #####
+Name                     ips        average  deviation         median
+Array  to_list       65.50 K       15.27 μs    ±18.44%       16.00 μs
+Map    to_list       55.73 K       17.94 μs    ±31.20%       16.00 μs
+Vector into          17.06 K       58.61 μs   ±129.18%         0.0 μs
+Map    into          13.31 K       75.14 μs   ±104.00%         0.0 μs
+Vector to_list        9.26 K      108.02 μs     ±4.11%      109.00 μs
+
+Comparison:
+Array  to_list       65.50 K
+Map    to_list       55.73 K - 1.18x slower
+Vector into          17.06 K - 3.84x slower
+Map    into          13.31 K - 4.92x slower
+Vector to_list        9.26 K - 7.08x slower
+
+##### With input 1'000'000 #####
+Name                     ips        average  deviation         median
+Array  to_list         53.27       18.77 ms    ±36.93%       16.00 ms
+Map    to_list         26.62       37.57 ms    ±57.36%       31.00 ms
+Vector into            10.97       91.19 ms    ±13.77%       94.00 ms
+Map    into             8.33      119.98 ms     ±6.39%      125.00 ms
+Vector to_list          6.31      158.49 ms     ±3.92%      156.00 ms
+
+Comparison:
+Array  to_list         53.27
+Map    to_list         26.62 - 2.00x slower
+Vector into            10.97 - 4.86x slower
+Map    into             8.33 - 6.39x slower
+Vector to_list          6.31 - 8.44x slower
 ```
