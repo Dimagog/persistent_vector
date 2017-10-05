@@ -6,8 +6,8 @@ only =
     _ -> nil
   end
 
-full  = System.argv == ["full"]
-quick = System.argv == ["quick"]
+full  = Enum.member?(System.argv, "full")
+quick = Enum.member?(System.argv, "quick")
 
 defmodule Runner do
   @print_opts [benchmarking: false, fast_warning: false, configuration: false]

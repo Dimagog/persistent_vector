@@ -7,6 +7,7 @@ call mix run bench\bench.exs %* >b
 
 if exist a (
   call %diff% a b
+  echo.
   set /P better=Is 'b' better [y/N]? 
   if /I "!better!" == "y" (
     echo New base 'a'

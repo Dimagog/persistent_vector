@@ -143,7 +143,7 @@ defmodule PersistentVectorTest do
   end
 
   property "Collectable" do
-    forall n <- nat() do
+    forall n <- choose(0, 1500) do
       v = erange(0, n) |> Enum.into(empty()) |> assert_element_identity()
       assert v |> count() == n
       assert (v |> Enum.into([])) == (erange(0, n) |> Enum.into([]))

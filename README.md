@@ -5,7 +5,8 @@
 
 ## Description
 
-`PersistentVector` is an array-like collection of values indexed by contiguous 0-based integer index.
+`PersistentVector` is an array-like collection of values indexed by contiguous 0-based integer index
+and optimized for growing/shrinking at the end.
 
 `PersistentVector` optimizes the following operations:
 * Get element count
@@ -27,7 +28,7 @@ Add `persistent_vector` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
 [
-  {:persistent_vector, "~> 0.1.3"}
+  {:persistent_vector, "~> 0.1.4"}
 ]
 end
 ```

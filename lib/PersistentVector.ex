@@ -1,6 +1,7 @@
 defmodule PersistentVector do
   @moduledoc """
-  `PersistentVector` is an array-like collection of values indexed by contiguous `0`-based integer index.
+  `PersistentVector` is an array-like collection of values indexed by contiguous `0`-based integer index
+  and optimized for growing/shrinking at the end.
 
   `PersistentVector` optimizes the following operations:
   * Get element count
@@ -454,16 +455,46 @@ defmodule PersistentVector do
       []
   """
   @spec to_list(t) :: [value]
-  def to_list(v = %@state{count: count})
-    when count > 0
+  def to_list(v = %@state{root: root, shift: shift})
   do
-    Enum.reduce(count-1 .. 0, [], &([v |> fast_get(&1) | &2]))
+    acc = Tuple.to_list(v.tail)
+    if root == {} do
+      acc
+    else
+      big? = shift > 2 * @shift
+      to_list(root, shift, tuple_size(root)-1, big?, acc)
+    end
   end
 
-  def to_list(%@state{})
-  # when count == 0
+  defp to_list(arr, level, i, big?, acc)
+    when level > 0
   do
-    []
+    child = elem(arr, i)
+    acc = to_list(child, level - @shift, tuple_size(child)-1, big?, acc)
+    if i > 0 do
+      to_list(arr, level, i-1, big?, acc)
+    else
+      acc
+    end
+  end
+
+  defp to_list(arr, _level, i, big?, acc)
+  # when level == 0
+  do
+    if big? do
+      to_list_leaf(arr, i-1, [elem(arr, i) | acc])
+    else
+      Tuple.to_list(arr) ++ acc
+    end
+  end
+
+  defp to_list_leaf(arr, i, acc) do
+    acc = [elem(arr, i) | acc]
+    if i > 0 do
+      to_list_leaf(arr, i-1, acc)
+    else
+      acc
+    end
   end
 
   @doc false # "See `Enumerable.reduce/3`"
